@@ -29,10 +29,10 @@ def EHI_sig(T,data,day):
     return EHI_sig
 
 
-def heat_wave(args):
+def heat_wave():
     #pred = np.array(eval(sys.argv[1]))
     prev_data=pd.read_csv('weather.csv')
-    prev_data=data.apply(lambda x: x.sort_values().values)
+    prev_data=prev_data.apply(lambda x: x.sort_values().values)
     with open('data.json') as data_file:
         data=json.load(data_file)
 
@@ -44,21 +44,23 @@ def heat_wave(args):
     EHI_sig2=EHI_sig(prev_data,data,1)
     EHI_sig3=EHI_sig(prev_data,data,2)
 
-    EHF1=np.max(1,EHI_accl1)*EHI_sig1
-    EHF2=np.max(1,EHI_accl2)*EHI_sig2
-    EHF3=np.max(1,EHI_accl3)*EHI_sig3
+    EHF1=np.maximum(1.0,EHI_accl1)*EHI_sig1
+    EHF2=np.maximum(1.0,EHI_accl2)*EHI_sig2
+    EHF3=np.maximum(1.0,EHI_accl3)*EHI_sig3
     if(EHF1>0 and EHF2 >0 and EHF3 >0):
         EHF_avg=(EHF1+EHF2+EHF3)/3
-        json_data=json.dumps({})
-        json_data['HEAT_WAVE_STATUS']=True
-        json_data['EHF']=EHF_avg
+        val={}
+        val['HEAT_WAVE_STATUS']='True'
+        val['EHF']=str(EHF_avg)
+        json_data=json.dumps(val)
         print(json_data)
     else:
-        json_data=json.dumps({})
-        json_data['HEAT_WAVE_STATUS']=False
-        json_data['EHF']=0
+        val={}
+        val['HEAT_WAVE_STATUS']='False'
+        val['EHF']='0'
+        json_data=json.dumps(val)
         print(json_data)
 
 
 if __name__=='__main__':
-    heat_wave(sys.argv)
+    heat_wave()
