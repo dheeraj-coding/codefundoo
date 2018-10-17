@@ -1,0 +1,27 @@
+{
+  "name": "codefundoo",
+  "version": "1.0.0",
+  "description": "Backend for the codefundoo heatwave predictor",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dheeraj-coding/codefundoo.git"
+  },
+  "author": "Dheeraj Mohan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dheeraj-coding/codefundoo/issues"
+  },
+  "homepage": "https://github.com/dheeraj-coding/codefundoo#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.7.0"
+  }
+}
