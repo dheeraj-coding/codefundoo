@@ -9,11 +9,11 @@ def EHI_accl(data,day):
         EHI_accl+=data['forecast'][i]['max_temp']
     EHI_accl/=3
     temp=0
-    for i in range(30-day):
+    for i in range(8-day):
         temp+=data['prior'][i]['max_temp']
     for i in range(day):
         temp+=data['forecast'][i]['max_temp']
-    temp/=30
+    temp/=8
     EHI_accl-=temp
     return EHI_accl
 
