@@ -5,6 +5,10 @@ const fs = require('fs');
 var app = express();
 const port = 3000;
 
+app.get('/',function(req, res){
+    res.send("Hello World!");
+});
+
 app.get('/heatwave', function (req, res) {
     console.log(req.query.lat);
     console.log(req.query.lon);
