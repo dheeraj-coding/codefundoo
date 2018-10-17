@@ -1,0 +1,24 @@
+{
+    "data": [
+        {
+            "max_temp": 27.1,
+            "min_temp": 20.6
+        },
+        {
+            "max_temp": 27.6,
+            "min_temp": 20.9
+        },
+        {
+            "max_temp": 27,
+            "min_temp": 20
+        },
+        {
+            "max_temp": 27.2,
+            "min_temp": 18.7
+        },
+        {
+            "max_temp": 27.3,
+            "min_temp": 19
+        }
+    ]
+}

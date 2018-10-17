@@ -1,5 +1,5 @@
 const express = require('express');
-const apixu = require('./apixu');
+const apixu = require('./src/apixu');
 const fs = require('fs');
 
 var app = express();
