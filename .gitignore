@@ -1,3 +1,7 @@
 node_modules/
 package-lock.json
-*.json
+data.json
+pip-selfcheck.json
+bin/
+include/
+lib/

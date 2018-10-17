@@ -2,6 +2,8 @@ const express = require('express');
 const weather = require('./src/apixu');
 const fs = require('fs');
 const moment = require('moment');
+const spawn = require('child_process').spawn;
+
 
 var app = express();
 var weatherFetcher = weather();
@@ -15,7 +17,11 @@ function log_to_csv(data) {
             return
         }
         console.log("Successfully saved data");
-    })
+    });
+    const pythonPredict = spawn('python',['./heat_wave_detect.py']);
+    pythonPredict.stdout.on('data',function(data){
+        console.log(data.toString());
+    });
 }
 
 app.get('/', function (req, res) {
