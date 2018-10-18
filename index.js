@@ -6,7 +6,6 @@ const spawn = require('child_process').spawn;
 
 
 var app = express();
-var weatherFetcher = weather();
 const port = 3000;
 
 function log_to_csv(resp, data) {
@@ -32,6 +31,7 @@ app.get('/', function (req, res) {
 app.get('/heatwave', function (req, res) {
     console.log(req.query.lat);
     console.log(req.query.lon);
+    var weatherFetcher = weather();
     weatherFetcher.getForecastData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
     weatherFetcher.getPriorData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
 });
