@@ -4,6 +4,7 @@ const fs = require('fs');
 const moment = require('moment');
 const spawn = require('child_process').spawn;
 const heatmap = require('./src/heatWaveTracker');
+const bodyParser = require('body-parser');
 
 var app = express();
 const port = 3000;
@@ -25,6 +26,8 @@ function log_to_csv(resp, data) {
     });
 }
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', function (req, res) {
     res.send("Hello World!");
 });
@@ -35,11 +38,11 @@ app.get('/heatwave', function (req, res) {
     weatherFetcher.getPriorData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
 });
 
-app.get('/hotloc', function (req, res) {
-    heatMapDB.insert(req.query.lat, req.query.lon).then((data) => {
+app.post('/hotloc', function (req, res) {
+    heatMapDB.insert(req.body.lat, req.body.lon).then((data) => {
         res.json({ 'data': data, 'status': 'success' });
-    },(err)=>{
-        console.log("Error"+err);
+    }, (err) => {
+        console.log("Error" + err);
     });
 });
 

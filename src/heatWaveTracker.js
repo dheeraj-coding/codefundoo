@@ -22,18 +22,14 @@ HeatMap.prototype.insert = function (lat, lon) {
                 reject();
             }
             parsed = JSON.parse(body);
-
-            collection.find({ 'city': parsed['address']['city'] }).toArray((err, docs) => {
+            collection.find({ 'postcode': parsed['address']['postcode'] }).toArray((err, docs) => {
                 if (docs.length == 0) {
-                    console.log("insert");
-                    collection.insertOne({ 'city': parsed['address']['city'], 'heatwave': true }, (err, result) => {
-                        console.log(result.ops);
+                    collection.insertOne({ 'postcode': parsed['address']['postcode'], 'heatwave': true }, (err, result) => {
                         resolve(result.ops);
                     });
                     return;
                 }
-                console.log("Udpte");
-                collection.updateOne({ 'city': parsed['address']['city'] }, { $set: { 'heatwave': true } }).then((result) => {
+                collection.updateOne({ 'postcode': parsed['address']['postcode'] }, { $set: { 'heatwave': true } }).then((result) => {
                     resolve(result);
                 });
             });
