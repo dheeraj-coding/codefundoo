@@ -7,6 +7,7 @@ const heatmap = require('./src/heatWaveTracker');
 const pushnotify = require('./src/pushNotification');
 const bodyParser = require('body-parser');
 const constants = require('./src/constants');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -33,7 +34,7 @@ setInterval(notifier.notificationServiceWorker.bind(notifier), constants.userChe
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', function (req, res) {
-    res.send("Hello World!");
+    res.sendFile(path.join(__dirname + '/public/index.html'));
 });
 
 app.get('/heatwave', function (req, res) {
@@ -72,6 +73,7 @@ app.put('/users', function (req, res) {
         res.json({ 'error': err, 'status': 'failed' });
     });
 })
+app.use(express.static(path.join(__dirname + '/public')));
 app.listen(process.env.PORT || port);
 
 
