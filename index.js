@@ -8,11 +8,14 @@ const pushnotify = require('./src/pushNotification');
 const bodyParser = require('body-parser');
 const constants = require('./src/constants');
 const path = require('path');
+const hospital = require('./src/hospitals');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 const heatMapDB = heatmap();
 const notifier = pushnotify();
+const hospitals = hospital();
 
 function log_to_csv(resp, data) {
     data['month'] = moment().format('M') - 1;
@@ -31,6 +34,7 @@ function log_to_csv(resp, data) {
 }
 setInterval(notifier.notificationServiceWorker.bind(notifier), constants.userCheckFrequency);
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', function (req, res) {
@@ -73,7 +77,17 @@ app.put('/users', function (req, res) {
         res.json({ 'error': err, 'status': 'failed' });
     });
 })
+//HTML file server.
 app.use(express.static(path.join(__dirname + '/public')));
+
+//DashBoard routes
+app.post('/hospitals', function (req, res) {
+    hospitals.register(req.body.name, req.body.password, req.body.repeat, req.body.lat, req.body.lon).then((result) => {
+        res.json({ 'data': result, 'status': 'success' });
+    }, (err) => {
+        res.json({ 'error': err, 'status': 'failed' });
+    });
+})
 app.listen(process.env.PORT || port);
 
 
