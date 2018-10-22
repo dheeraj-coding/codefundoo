@@ -10,7 +10,7 @@ module.exports = function () {
 }
 function PushNotifier() {
     this.db = new DB();
-    this.db.connect(constants.uri, 'HeatMap').then(() => console.log('DB connection successful'), () => console.log("DB connection unsuccessful"));
+    this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Push Notify DB connection successful'), () => console.log("DB connection unsuccessful"));
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
         databaseURL: "https://codefundoo-1539958868140.firebaseio.com"

@@ -7,7 +7,7 @@ module.exports = function () {
 }
 function Hospitals() {
     this.db = new DB();
-    this.db.connect(constants.uri, 'HeatMap').then(() => console.log('DB connection successful'), () => console.log("DB connection unsuccessful"));
+    this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Hospitals DB connection successful'), () => console.log("DB connection unsuccessful"));
 }
 Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
     const collection = this.db.db.collection('hospitals');

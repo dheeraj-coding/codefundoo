@@ -1,18 +1,20 @@
 const express = require('express');
-const weather = require('./src/apixu');
 const fs = require('fs');
 const moment = require('moment');
 const spawn = require('child_process').spawn;
+const bodyParser = require('body-parser');
+const path = require('path');
+const cors = require('cors');
+const request = require('request');
+
+const weather = require('./src/apixu');
 const heatmap = require('./src/heatWaveTracker');
 const pushnotify = require('./src/pushNotification');
-const bodyParser = require('body-parser');
 const constants = require('./src/constants');
-const path = require('path');
 const hospital = require('./src/hospitals');
-const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = 8080;
 const heatMapDB = heatmap();
 const notifier = pushnotify();
 const hospitals = hospital();
@@ -28,7 +30,6 @@ function log_to_csv(resp, data) {
     });
     const pythonPredict = spawn('python', ['./heat_wave_detect.py']);
     pythonPredict.stdout.on('data', function (data) {
-        console.log(data.toString());
         resp.json(JSON.parse(data.toString()));
     });
 }
@@ -43,8 +44,22 @@ app.get('/', function (req, res) {
 
 app.get('/heatwave', function (req, res) {
     var weatherFetcher = weather();
-    weatherFetcher.getForecastData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
-    weatherFetcher.getPriorData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
+    const lat = req.query.lat;
+    const lon = req.query.lon;
+    request({
+        uri: 'https://eu1.locationiq.com/v1/reverse.php?key=' + constants.apiKey + '&lat=' + lat + '&lon=' + lon + '&format=json',
+        method: "GET",
+        followRedirect: true,
+    }, (error, response, body) => {
+        if (error) {
+            console.log('Error in Reverse Geocoder');
+            reject(err);
+        }
+        parsed = JSON.parse(body);
+        weatherFetcher.getForecastData(req.query.lat, req.query.lon, log_to_csv.bind(this, res));
+        weatherFetcher.getPriorData(req.query.lat, req.query.lon, parsed['address']['postcode'], log_to_csv.bind(this, res));
+    });
+
 });
 
 app.post('/hotloc', function (req, res) {

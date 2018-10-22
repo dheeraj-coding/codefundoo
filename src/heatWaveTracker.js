@@ -7,7 +7,7 @@ module.exports = function () {
 }
 function HeatMap() {
     this.db = new DB();
-    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("DB Connection Successful:"), () => console.log("DB Connection Failed"));
+    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
 }
 HeatMap.prototype.insert = function (lat, lon) {
     const collection = this.db.db.collection('locations');
@@ -51,7 +51,6 @@ HeatMap.prototype.addAffectedUser = function (lat, lon, userid) {
             }
             parsed = JSON.parse(body);
             collection.updateOne({ 'postcode': parsed['address']['postcode'] }, { $addToSet: { "affected_user": userid } }).then((result) => {
-                console.log(result);
                 resolve(result);
             });
 
@@ -95,10 +94,8 @@ HeatMap.prototype.updateUser = function (lat, lon, userid) {
             }
             parsed = JSON.parse(body);
             collection.updateOne({ '_id': new ObjectID(userid) }, { $set: { 'postcode': parsed['address']['postcode'] } }, { upsert: true }).then((result) => {
-                console.log(result);
                 resolve(result.ops);
             }, (err) => {
-                console.log(err);
                 reject(err);
             })
         })
