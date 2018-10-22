@@ -6,18 +6,49 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const request = require('request');
+const json2csv = require('json2csv').Parser;
 
 const weather = require('./src/apixu');
 const heatmap = require('./src/heatWaveTracker');
 const pushnotify = require('./src/pushNotification');
 const constants = require('./src/constants');
 const hospital = require('./src/hospitals');
+const DB = require('./src/db');
 
 const app = express();
 const port = 8080;
 const heatMapDB = heatmap();
 const notifier = pushnotify();
 const hospitals = hospital();
+
+const data_fields = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtemp_c", "avgtemp_f",
+    "maxwind_mph", "maxwind_kph", "totalprecip_mm", "totalprecip_in", "avgvis_km", "avgvis_miles", "avghumidity", "date"];
+const opts = { data_fields };
+const parser = new json2csv(opts);
+var db = new DB();
+db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
+
+setInterval(() => {
+    const collection = db.db.collection('weather');
+    var weather_list = [];
+    collection.find().toArray((err, result) => {
+        result.forEach((val) => {
+            val['weather'].forEach((weathVal) => {
+                weather_list.push(weathVal);
+            })
+        });
+        console.log(weather_list);
+        const csv = parser.parse(weather_list);
+        fs.writeFile('./data.csv', csv, function (err) {
+            if (err) {
+                console.log("Error writing csv to file");
+                return
+            }
+            console.log("Successfully csv saved data");
+        });
+    });
+}, constants.dataDumpFrequency);
+
 
 function log_to_csv(resp, data) {
     data['month'] = moment().format('M') - 1;
@@ -104,7 +135,3 @@ app.post('/hospitals', function (req, res) {
     });
 })
 app.listen(process.env.PORT || port);
-
-
-
-

@@ -55,7 +55,7 @@ WeatherFetch.prototype.getPriorData = function (lat, long, postcode, callback) {
             }
             var parsed = JSON.parse(body);
             var forecastday = parsed.forecast.forecastday;
-            collection.updateOne({ 'postcode': postcode }, { $addToSet: { 'weather': forecastday[0] } }, { upsert: true, safe: false }).then((result) => {
+            collection.updateOne({ 'postcode': postcode }, { $addToSet: { 'weather': Object.assign(forecastday[0]['day'], { 'date': forecastday[0]['date'] }) } }, { upsert: true, safe: false }).then((result) => {
                 console.log("Add to DB");
             }, (err) => {
                 console.log("Couldn't Add to DB:" + err);
