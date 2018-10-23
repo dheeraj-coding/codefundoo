@@ -53,12 +53,20 @@ def heat_wave():
         val['HEAT_WAVE_STATUS']='True'
         val['EHF']=str(EHF_avg)
         json_data=json.dumps(val)
+        result=np.zeros((8,1))
+        result[:,0]=1
+        df=pd.DataFrame(result)
+        df.to_csv('result.csv')
         print(json_data)
     else:
         val={}
         val['HEAT_WAVE_STATUS']='False'
         val['EHF']='0'
         json_data=json.dumps(val)
+        result=np.zeros((8,1))
+        result[:,0]=0
+        df=pd.DataFrame(result)
+        df.to_csv('result.csv')
         print(json_data)
 
 
