@@ -1,6 +1,7 @@
 const DB = require('./db');
 const constants = require('./constants');
 const request = require('request');
+const hospitals = require('./hospitals');
 const ObjectID = require('mongodb').ObjectID;
 module.exports = function () {
     return new HeatMap();
@@ -38,6 +39,7 @@ HeatMap.prototype.insert = function (lat, lon) {
 }
 HeatMap.prototype.addAffectedUser = function (lat, lon, userid) {
     const collection = this.db.db.collection('locations');
+    const collectionUser = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
         request({
             uri: 'https://eu1.locationiq.com/v1/reverse.php?key=' + constants.apiKey + '&lat=' + lat + '&lon=' + lon + '&format=json',
@@ -51,13 +53,15 @@ HeatMap.prototype.addAffectedUser = function (lat, lon, userid) {
             }
             parsed = JSON.parse(body);
             collection.updateOne({ 'postcode': parsed['address']['postcode'] }, { $addToSet: { "affected_user": userid } }).then((result) => {
-                resolve(result);
+                collectionUser.find({ '_id': new ObjectID(userid) }).toArray((err, docs) => {
+                    resolve(docs[0]);
+                });
             });
 
         });
     });
 }
-HeatMap.prototype.insertUser = function (lat, lon, name, regtoken) {
+HeatMap.prototype.insertUser = function (lat, lon, phone, name, regtoken) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
         request({
@@ -71,7 +75,7 @@ HeatMap.prototype.insertUser = function (lat, lon, name, regtoken) {
                 return;
             }
             parsed = JSON.parse(body);
-            collection.insertOne({ 'name': name, 'postcode': parsed['address']['postcode'], 'regtoken': regtoken }).then((result) => {
+            collection.insertOne({ 'name': name, 'postcode': parsed['address']['postcode'], 'regtoken': regtoken, 'phone': phone }).then((result) => {
                 resolve(result.ops[0]);
             }, (err) => {
                 reject(err);

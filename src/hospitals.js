@@ -1,4 +1,6 @@
 const DB = require('./db');
+const admin = require('firebase-admin');
+const serviceAccount = require('../serviceAcountKey.json');
 const constants = require('./constants');
 const request = require('request');
 
@@ -8,6 +10,7 @@ module.exports = function () {
 function Hospitals() {
     this.db = new DB();
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Hospitals DB connection successful'), () => console.log("DB connection unsuccessful"));
+    this.admin = admin;
 }
 Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
     const collection = this.db.db.collection('hospitals');
@@ -31,5 +34,16 @@ Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
             }
 
         });
+    });
+}
+Hospitals.prototype.pushToFirebase = function (name, phone, lat, lon, postcode) {
+    let db = admin.database();
+    let ref = db.ref('locations/' + postcode + '/affected');
+    let newRow = ref.push();
+    newRow.set({
+        'name': name,
+        'phone': phone,
+        'lat': lat,
+        'lon': lon,
     });
 }

@@ -103,6 +103,7 @@ app.post('/hotloc', function (req, res) {
 });
 app.post('/affected', function (req, res) {
     heatMapDB.addAffectedUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
+        hospitals.pushToFirebase(data.name, data.phone, req.body.lat, req.body.lon, data.postcode);
         res.json({ 'data': data, 'status': 'success' });
     }, (err) => {
         console.log("Error" + err);
@@ -110,7 +111,7 @@ app.post('/affected', function (req, res) {
     })
 });
 app.post('/users', function (req, res) {
-    heatMapDB.insertUser(req.body.lat, req.body.lon, req.body.name, req.body.regtoken).then((data) => {
+    heatMapDB.insertUser(req.body.lat, req.body.lon, req.body.phone, req.body.name, req.body.regtoken).then((data) => {
         res.json({ 'data': data, 'status': 'success' });
     }, (err) => {
         res.json({ 'error': err, 'status': 'failed' });
