@@ -50,17 +50,28 @@ setInterval(() => {
     });
 }, constants.dataDumpFrequency);
 
-function heartRateMonitor(userid) {
+function heartRateMonitor(userid, resp) {
     const collection = db.db.collection('users');
     collection.find({ '_id': new ObjectID(userid) }).toArray((err, result) => {
-        fs.writeFile('./heartrate.json', JSON.stringify({ 'Points': result[0]['Points'] }, null, 4), function (err) {
-            if (err) {
-                console.log("Error writing to file");
-                return
-            }
-            console.log("Successfully saved heart_rate data");
-        });
+        if (result.length >= 0) {
+            fs.writeFile('./heartrate.json', JSON.stringify({ 'Points': result[0]['Points'] }, null, 4), function (err) {
+                if (err) {
+                    console.log("Error writing to file");
+                    return
+                }
+                const pythonPredict = spawn('python', ['./anomaly_detection.py']);
+                pythonPredict.stdout.on('data', function (data) {
+                    resp.json(JSON.parse(data.toString()));
+                });
+                console.log("Successfully saved heart_rate data");
+            });
+        } else {
+            resp.json({ 'status': 'success' });
+        }
+
+
     });
+
 }
 
 function log_to_csv(resp, data) {
@@ -70,12 +81,13 @@ function log_to_csv(resp, data) {
             console.log("Error writing to file");
             return
         }
+        const pythonPredict = spawn('python', ['./heat_wave_detect.py']);
+        pythonPredict.stdout.on('data', function (data) {
+            resp.json(JSON.parse(data.toString()));
+        });
         console.log("Successfully saved data");
     });
-    const pythonPredict = spawn('python', ['./heat_wave_detect.py']);
-    pythonPredict.stdout.on('data', function (data) {
-        resp.json(JSON.parse(data.toString()));
-    });
+
 }
 setInterval(notifier.notificationServiceWorker.bind(notifier), constants.userCheckFrequency);
 
@@ -133,8 +145,7 @@ app.post('/users', function (req, res) {
 app.put('/users', function (req, res) {
     if (req.body.heart_rate) {
         heatMapDB.updateHeartRate(req.body.userid, req.body.heart_rate).then((data) => {
-            heartRateMonitor(req.body.userid);
-            res.json({ 'data': data, 'status': 'success' });
+            heartRateMonitor(req.body.userid, res);
         }, (err) => {
             res.json({ 'error': err, 'status': 'failed' });
         });
