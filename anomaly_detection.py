@@ -11,10 +11,11 @@ def detect(url, subscription_key, request_data):
         print(response.status_code)
         raise Exception(response.text)
 
-
-sample_data = "[REPLACE_WITH_THE_EXAMPLE_OR_YOUR_OWN_DATA_POINTS]"
+with open('heartrate.json') as data_file:
+    data=json.load(data_file)
+sample_data = data
 endpont = "https://api.labs.cognitive.microsoft.com/anomalyfinder/v1.0/anomalydetection"
-subscription_key = "[YOUR_SUBSCRIPTION_KEY]"
+subscription_key = "ff7b35da97ca413591d8031024e7f6ff"
 
 result = detect(endpont, subscription_key, sample_data)
 print(result)
