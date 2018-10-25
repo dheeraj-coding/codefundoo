@@ -36,7 +36,7 @@ Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
         });
     });
 }
-Hospitals.prototype.pushToFirebase = function (name, phone, lat, lon, postcode) {
+Hospitals.prototype.pushToFirebase = function (name, phone, lat, lon, postcode, display_name) {
     let db = admin.database();
     let ref = db.ref('locations/' + postcode + '/affected');
     let newRow = ref.push();
@@ -45,5 +45,10 @@ Hospitals.prototype.pushToFirebase = function (name, phone, lat, lon, postcode) 
         'phone': phone,
         'lat': lat,
         'lon': lon,
+    });
+    db.ref('locations/' + postcode).update({
+        'lat': lat,
+        'lon': lon,
+        'display_name': display_name
     });
 }

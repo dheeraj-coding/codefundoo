@@ -2,6 +2,7 @@ const DB = require('./db');
 const constants = require('./constants');
 const request = require('request');
 const hospitals = require('./hospitals');
+const moment = require('moment');
 const ObjectID = require('mongodb').ObjectID;
 module.exports = function () {
     return new HeatMap();
@@ -75,7 +76,7 @@ HeatMap.prototype.insertUser = function (lat, lon, phone, name, regtoken) {
                 return;
             }
             parsed = JSON.parse(body);
-            collection.insertOne({ 'name': name, 'postcode': parsed['address']['postcode'], 'regtoken': regtoken, 'phone': phone }).then((result) => {
+            collection.insertOne({ 'name': name, 'postcode': parsed['address']['postcode'], 'regtoken': regtoken, 'phone': phone, 'display_name': parsed['display_name'] }).then((result) => {
                 resolve(result.ops[0]);
             }, (err) => {
                 reject(err);
@@ -104,6 +105,16 @@ HeatMap.prototype.updateUser = function (lat, lon, userid) {
             })
         })
     })
+}
+HeatMap.prototype.updateHeartRate = function (userid, heart_rate) {
+    const collection = this.db.db.collection('users');
+    return new Promise((resolve, reject) => {
+        collection.updateOne({ '_id': new ObjectID(userid) }, { $addToSet: { 'Points': { 'Timestamp': moment().utc().format(), 'Value': heart_rate } } }, { upsert: true }).then((result) => {
+            resolve(result);
+        }, (err) => {
+            reject(err);
+        })
+    });
 }
 
 

@@ -7,6 +7,7 @@ const path = require('path');
 const cors = require('cors');
 const request = require('request');
 const json2csv = require('json2csv').Parser;
+const ObjectID = require('mongodb').ObjectID;
 
 const weather = require('./src/apixu');
 const heatmap = require('./src/heatWaveTracker');
@@ -49,6 +50,18 @@ setInterval(() => {
     });
 }, constants.dataDumpFrequency);
 
+function heartRateMonitor(userid) {
+    const collection = db.db.collection('users');
+    collection.find({ '_id': new ObjectID(userid) }).toArray((err, result) => {
+        fs.writeFile('./heartrate.json', JSON.stringify({ 'Points': result[0]['Points'] }, null, 4), function (err) {
+            if (err) {
+                console.log("Error writing to file");
+                return
+            }
+            console.log("Successfully saved heart_rate data");
+        });
+    });
+}
 
 function log_to_csv(resp, data) {
     data['month'] = moment().format('M') - 1;
@@ -103,7 +116,7 @@ app.post('/hotloc', function (req, res) {
 });
 app.post('/affected', function (req, res) {
     heatMapDB.addAffectedUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
-        hospitals.pushToFirebase(data.name, data.phone, req.body.lat, req.body.lon, data.postcode);
+        hospitals.pushToFirebase(data.name, data.phone, req.body.lat, req.body.lon, data.postcode, data.display_name);
         res.json({ 'data': data, 'status': 'success' });
     }, (err) => {
         console.log("Error" + err);
@@ -118,11 +131,20 @@ app.post('/users', function (req, res) {
     })
 });
 app.put('/users', function (req, res) {
-    heatMapDB.updateUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
-        res.json({ 'data': data, 'status': 'success' });
-    }, (err) => {
-        res.json({ 'error': err, 'status': 'failed' });
-    });
+    if (req.body.heart_rate) {
+        heatMapDB.updateHeartRate(req.body.userid, req.body.heart_rate).then((data) => {
+            heartRateMonitor(req.body.userid);
+            res.json({ 'data': data, 'status': 'success' });
+        }, (err) => {
+            res.json({ 'error': err, 'status': 'failed' });
+        });
+    } else {
+        heatMapDB.updateUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
+            res.json({ 'data': data, 'status': 'success' });
+        }, (err) => {
+            res.json({ 'error': err, 'status': 'failed' });
+        });
+    }
 })
 //HTML file server.
 app.use(express.static(path.join(__dirname + '/public')));
