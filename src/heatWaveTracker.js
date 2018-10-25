@@ -10,7 +10,7 @@ module.exports = function () {
 
 function HeatMap() {
     this.db = new DB();
-    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
+    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), (err) => console.log("DB Connection Failed:" + err));
 }
 
 HeatMap.prototype.insert = function (lat, lon) {

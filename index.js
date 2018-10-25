@@ -27,7 +27,7 @@ const data_fields = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtem
 const opts = { data_fields };
 const parser = new json2csv(opts);
 var db = new DB();
-db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
+db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), (err) => console.log("DB Connection Failed:" + err));
 
 
 function heartRateMonitor(userid, resp) {

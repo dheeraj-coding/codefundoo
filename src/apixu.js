@@ -12,7 +12,7 @@ function weather(config) {
 
 function WeatherFetch(config) {
     this.db = new DB();
-    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("APIXU DB Connection Successful:"), () => console.log("DB Connection Failed"));
+    this.db.connect(constants.uri, 'HeatMap').then(() => console.log("APIXU DB Connection Successful:"), (err) => console.log("DB Connection Failed:" + err));
     this.config = config;
     this.data = { forecast: [], prior: [] };
     this.forecastFlag = false;
