@@ -82,7 +82,6 @@ setInterval(() => {
                 weather_list.push(weathVal);
             })
         });
-        console.log(weather_list);
         const csv = parser.parse(weather_list);
         fs.writeFile('./data.csv', csv, function (err) {
             if (err) {

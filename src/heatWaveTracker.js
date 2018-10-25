@@ -103,7 +103,7 @@ HeatMap.prototype.updateUser = function (lat, lon, userid) {
                 return;
             }
             parsed = JSON.parse(body);
-            collection.updateOne({ '_id': new ObjectID(userid) }, { $set: { 'postcode': parsed['address']['postcode'] } }, { upsert: true }).then((result) => {
+            collection.updateOne({ '_id': new ObjectID(userid) }, { $set: { 'postcode': parsed['address']['postcode'], 'display_name': parsed['display_name'] } }, { upsert: true }).then((result) => {
                 resolve(result.ops);
             }, (err) => {
                 reject(err);
