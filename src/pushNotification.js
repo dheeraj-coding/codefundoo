@@ -1,13 +1,12 @@
-
 const admin = require("firebase-admin");
 const serviceAccount = require("../serviceAcountKey.json");
 const constants = require('./constants');
 const DB = require('./db');
 
-
 module.exports = function () {
     return new PushNotifier();
 }
+
 function PushNotifier() {
     this.db = new DB();
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Push Notify DB connection successful'), () => console.log("DB connection unsuccessful"));
@@ -31,6 +30,7 @@ PushNotifier.prototype.notify = function (regtoken) {
         console.log("Message Failed:" + err);
     });
 }
+
 PushNotifier.prototype.alertLocality = function (postalcode) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
@@ -41,6 +41,7 @@ PushNotifier.prototype.alertLocality = function (postalcode) {
         });
     });
 }
+
 PushNotifier.prototype.notificationServiceWorker = function () {
     const collection = this.db.db.collection('locations');
     collection.find().toArray().then((results) => {

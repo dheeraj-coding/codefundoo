@@ -29,26 +29,6 @@ const parser = new json2csv(opts);
 var db = new DB();
 db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
 
-setInterval(() => {
-    const collection = db.db.collection('weather');
-    var weather_list = [];
-    collection.find().toArray((err, result) => {
-        result.forEach((val) => {
-            val['weather'].forEach((weathVal) => {
-                weather_list.push(weathVal);
-            })
-        });
-        console.log(weather_list);
-        const csv = parser.parse(weather_list);
-        fs.writeFile('./data.csv', csv, function (err) {
-            if (err) {
-                console.log("Error writing csv to file");
-                return
-            }
-            console.log("Successfully csv saved data");
-        });
-    });
-}, constants.dataDumpFrequency);
 
 function heartRateMonitor(userid, resp) {
     const collection = db.db.collection('users');
@@ -89,11 +69,39 @@ function log_to_csv(resp, data) {
     });
 
 }
+
+
 setInterval(notifier.notificationServiceWorker.bind(notifier), constants.userCheckFrequency);
+
+setInterval(() => {
+    const collection = db.db.collection('weather');
+    var weather_list = [];
+    collection.find().toArray((err, result) => {
+        result.forEach((val) => {
+            val['weather'].forEach((weathVal) => {
+                weather_list.push(weathVal);
+            })
+        });
+        console.log(weather_list);
+        const csv = parser.parse(weather_list);
+        fs.writeFile('./data.csv', csv, function (err) {
+            if (err) {
+                console.log("Error writing csv to file");
+                return
+            }
+            console.log("Successfully csv saved data");
+            const pythonPredict = spawn('python', ['./heat_wave_analysis.py']);
+            pythonPredict.stdout.on('data', function (data) {
+                console.log("Python Predictive model accuracy:" + data.toString());
+            });
+        });
+    });
+}, constants.dataDumpFrequency);
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/public/index.html'));
 });
@@ -126,6 +134,7 @@ app.post('/hotloc', function (req, res) {
         res.json({ 'status': 'failed', 'error': err });
     });
 });
+
 app.post('/affected', function (req, res) {
     heatMapDB.addAffectedUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
         hospitals.pushToFirebase(data.name, data.phone, req.body.lat, req.body.lon, data.postcode, data.display_name);
@@ -135,6 +144,7 @@ app.post('/affected', function (req, res) {
         res.json({ 'status': 'failed', 'error': err });
     })
 });
+
 app.post('/users', function (req, res) {
     heatMapDB.insertUser(req.body.lat, req.body.lon, req.body.phone, req.body.name, req.body.regtoken).then((data) => {
         res.json({ 'data': data, 'status': 'success' });
@@ -142,6 +152,7 @@ app.post('/users', function (req, res) {
         res.json({ 'error': err, 'status': 'failed' });
     })
 });
+
 app.put('/users', function (req, res) {
     if (req.body.heart_rate) {
         heatMapDB.updateHeartRate(req.body.userid, req.body.heart_rate).then((data) => {
@@ -156,7 +167,8 @@ app.put('/users', function (req, res) {
             res.json({ 'error': err, 'status': 'failed' });
         });
     }
-})
+});
+
 //HTML file server.
 app.use(express.static(path.join(__dirname + '/public')));
 
@@ -167,5 +179,5 @@ app.post('/hospitals', function (req, res) {
     }, (err) => {
         res.json({ 'error': err, 'status': 'failed' });
     });
-})
+});
 app.listen(process.env.PORT || port);

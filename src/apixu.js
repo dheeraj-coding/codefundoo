@@ -3,6 +3,13 @@ const constants = require('./constants');
 const moment = require('moment');
 const DB = require('./db');
 const fs = require('fs');
+
+module.exports = weather;
+
+function weather(config) {
+    return new WeatherFetch(config);
+}
+
 function WeatherFetch(config) {
     this.db = new DB();
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log("APIXU DB Connection Successful:"), () => console.log("DB Connection Failed"));
@@ -71,9 +78,3 @@ WeatherFetch.prototype.getPriorData = function (lat, long, postcode, callback) {
         });
     }
 }
-
-function weather(config) {
-    return new WeatherFetch(config);
-}
-
-module.exports = weather;

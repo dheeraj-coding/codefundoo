@@ -7,11 +7,13 @@ const request = require('request');
 module.exports = function () {
     return new Hospitals();
 }
+
 function Hospitals() {
     this.db = new DB();
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Hospitals DB connection successful'), () => console.log("DB connection unsuccessful"));
     this.admin = admin;
 }
+
 Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
     const collection = this.db.db.collection('hospitals');
     return new Promise((resolve, reject) => {
@@ -36,6 +38,7 @@ Hospitals.prototype.register = function (name, password, repeat, lat, lon) {
         });
     });
 }
+
 Hospitals.prototype.pushToFirebase = function (name, phone, lat, lon, postcode, display_name) {
     let db = admin.database();
     let ref = db.ref('locations/' + postcode + '/affected');

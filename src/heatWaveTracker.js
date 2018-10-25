@@ -1,16 +1,18 @@
 const DB = require('./db');
 const constants = require('./constants');
 const request = require('request');
-const hospitals = require('./hospitals');
 const moment = require('moment');
 const ObjectID = require('mongodb').ObjectID;
+
 module.exports = function () {
     return new HeatMap();
 }
+
 function HeatMap() {
     this.db = new DB();
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log("HEATMAP DB Connection Successful:"), () => console.log("DB Connection Failed"));
 }
+
 HeatMap.prototype.insert = function (lat, lon) {
     const collection = this.db.db.collection('locations');
     return new Promise((resolve, reject) => {
@@ -38,6 +40,7 @@ HeatMap.prototype.insert = function (lat, lon) {
         });
     });
 }
+
 HeatMap.prototype.addAffectedUser = function (lat, lon, userid) {
     const collection = this.db.db.collection('locations');
     const collectionUser = this.db.db.collection('users');
@@ -62,6 +65,7 @@ HeatMap.prototype.addAffectedUser = function (lat, lon, userid) {
         });
     });
 }
+
 HeatMap.prototype.insertUser = function (lat, lon, phone, name, regtoken) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
@@ -84,6 +88,7 @@ HeatMap.prototype.insertUser = function (lat, lon, phone, name, regtoken) {
         });
     });
 }
+
 HeatMap.prototype.updateUser = function (lat, lon, userid) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
@@ -106,6 +111,7 @@ HeatMap.prototype.updateUser = function (lat, lon, userid) {
         })
     })
 }
+
 HeatMap.prototype.updateHeartRate = function (userid, heart_rate) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
