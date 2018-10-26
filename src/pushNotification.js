@@ -12,7 +12,8 @@ function PushNotifier() {
     this.db.connect(constants.uri, 'HeatMap').then(() => console.log('Push Notify DB connection successful'), () => console.log("DB connection unsuccessful"));
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://codefundoo-1539958868140.firebaseio.com"
+        databaseURL: "https://codefundo-1540582424753.firebaseio.com",
+        projectId: 'codefundo-1540582424753'
     });
     this.admin = admin;
 }
@@ -20,7 +21,7 @@ function PushNotifier() {
 PushNotifier.prototype.notify = function (regtoken) {
     var message = {
         data: {
-            'heatwave': "true",
+            'heatwave': 'A Heatwave has been detected in your surrounding, please stay indoors and always remember to stay in a cool place',
         },
         token: regtoken,
     };
