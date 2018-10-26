@@ -159,6 +159,18 @@ app.put('/users', function (req, res) {
         }, (err) => {
             res.json({ 'error': err, 'status': 'failed' });
         });
+    } else if (req.body.name && req.body.phone) {
+        heatMapDB.updateUserDetails(req.body.name, req.body.phone, req.body.userid).then((data) => {
+            res.json({ 'data': data, 'status': 'success' });
+        }, (err) => {
+            res.json({ 'error': err, 'status': 'failed' });
+        })
+    } else if (req.body.regtoken) {
+        heatMapDB.updateUserRegToken(req.body.regtoken, req.body.userid).then((data) => {
+            res.json({ 'data': data, 'status': 'success' });
+        }, (err) => {
+            res.json({ 'error': err, 'status': 'failed' });
+        })
     } else {
         heatMapDB.updateUser(req.body.lat, req.body.lon, req.body.userid).then((data) => {
             res.json({ 'data': data, 'status': 'success' });

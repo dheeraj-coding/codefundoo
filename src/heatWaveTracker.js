@@ -112,6 +112,28 @@ HeatMap.prototype.updateUser = function (lat, lon, userid) {
     })
 }
 
+HeatMap.prototype.updateUserDetails = function (name, phone, userid) {
+    const collection = this.db.db.collection('users');
+    return new Promise((resolve, reject) => {
+        collection.updateOne({ '_id': new ObjectID(userid) }, { $set: { 'name': name, 'phone': phone } }, { upsert: true }).then((result) => {
+            resolve(result.ops);
+        }, (err) => {
+            reject(err);
+        });
+    });
+}
+
+HeatMap.prototype.updateUserRegToken = function (regtoken, userid) {
+    const collection = this.db.db.collection('users');
+    return new Promise((resolve, reject) => {
+        collection.updateOne({ '_id': new ObjectID(userid) }, { $set: { 'regtoken': regtoken } }, { upsert: true }).then((result) => {
+            resolve(result.ops);
+        }, (err) => {
+            reject(err);
+        });
+    });
+}
+
 HeatMap.prototype.updateHeartRate = function (userid, heart_rate) {
     const collection = this.db.db.collection('users');
     return new Promise((resolve, reject) => {
