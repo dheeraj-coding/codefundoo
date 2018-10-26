@@ -2,7 +2,6 @@ const request = require('request');
 const constants = require('./constants');
 const moment = require('moment');
 const DB = require('./db');
-const fs = require('fs');
 
 module.exports = weather;
 
@@ -21,7 +20,7 @@ function WeatherFetch(config) {
 
 WeatherFetch.prototype.getForecastData = function (lat, long, callback, ) {
     const location = lat + "," + long;
-    const requestUri = "http://api.apixu.com/v1/forecast.json?key=a587248a962148a184b125410181610&q=" + location + "&days=5";
+    const requestUri = "http://api.apixu.com/v1/forecast.json?key=" + constants.apixuKey + "&q=" + location + "&days=5";
     var parsed = {};
     request({
         uri: requestUri,
