@@ -11,7 +11,7 @@ def detect(url, subscription_key, request_data):
         print(response.status_code)
         raise Exception(response.text)
 
-with open('test.json') as data_file:
+with open('heartrate.json') as data_file:
     data=json.load(data_file)
 sample_data = data
 endpont = "https://api.labs.cognitive.microsoft.com/anomalyfinder/v1.0/anomalydetection"
